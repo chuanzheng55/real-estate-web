@@ -19,7 +19,7 @@ const SignUp = () => {
     e.preventDefault();
     try {
       setLoading(true);
-      const res = await fetch("/api/auth/signup", {
+      const res = await fetch("/api/auth/signup", {              //get response by fetching the data from this url
         method: "POST",
         headers: {
           "Content-type": "application/json",
@@ -27,12 +27,13 @@ const SignUp = () => {
         body: JSON.stringify(formData),
       });
       const data = await res.json(); // response to json
+      
       if (data.success === false) {
         setLoading(false);
         setError(data.message);
         return;
       }
-      // if everything is good set loading and error is default
+      // if everything is good set loading and error is default 
       setLoading(false);
       setError(null);
       navigate('/sign-in')
