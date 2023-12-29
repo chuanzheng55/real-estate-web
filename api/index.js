@@ -17,6 +17,7 @@ mongoose
 
 const app = express();
 
+//allow to use json as input of the server
 app.use(express.json());
 
 app.listen(3000, () => {
@@ -31,7 +32,6 @@ app.get("/test", (req, res) => {
 });
 
 app.use("/api/user", userRouter);
-
 app.use("/api/auth", authRouter);
 
 app.use((err, req, res, next) => {

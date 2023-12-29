@@ -11,20 +11,20 @@ const SignUp = () => {
 
   const handleChange = (e) => {
     setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
+      ...formData,              // to keep track of the previous data input
+      [e.target.id]: e.target.value,           // use id to keep track of the data changes
     });
   };
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    e.preventDefault();     
     try {
       setLoading(true);
-      const res = await fetch("/api/auth/signup", {              //get response by fetching the data from this url
+      const res = await fetch("/api/auth/signup", {              //get response by fetching the data from this url, refers to the proxy
         method: "POST",
         headers: {
           "Content-type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(formData),    //?
       });
       const data = await res.json(); // response to json
       
