@@ -34,3 +34,16 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteUser = async (req, res, next) => {
+  // req.user.id is from the verifyUser.js and params is from the user routes :id
+  if (req.user.id !== req.params.id)
+    return next(errorHandler(401, "Log in to delete your own account!"));
+  try {
+    await User.findByIdAndDelete(req.params.id);
+    res.clearCookie("access_token");
+    res.status(200).json("User has been deleted!");
+  } catch (error) {
+    next(error);
+  }
+};
