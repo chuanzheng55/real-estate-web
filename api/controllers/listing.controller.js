@@ -96,7 +96,11 @@ export const getListings = async (req, res, next) => {
 
     const listing = await Listing.find({
       //moogoose db regex
-      name: { $regex: searchTerm, $options: "i" },
+
+      $or: [
+        { name: { $regex: searchTerm, $options: "i" } },
+        { description: { $regex: searchTerm, $options: "i" } },
+      ],
       offer,
       furnished,
       parking,
