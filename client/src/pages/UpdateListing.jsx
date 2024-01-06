@@ -304,9 +304,11 @@ const CreateListing = () => {
                 onChange={handleChange}
                 value={formData.regularPrice}
               />
-              <div className="flex flex-col items-center">
-                <p>Regular Price</p>
-                <span className="text-sm">($ / month)</span>
+              <div className='flex flex-col items-center'>
+                <p>Regular price</p>
+                {formData.type === 'rent' && (
+                  <span className='text-xs'>($ / month)</span>
+                )}
               </div>
             </div>
             {formData.offer && (
@@ -321,9 +323,12 @@ const CreateListing = () => {
                   onChange={handleChange}
                   value={formData.discountPrice}
                 />
-                <div className="flex flex-col items-center">
-                  <p>Discounted Prices</p>
-                  <span className="text-sm">($ / month)</span>
+                <div className='flex flex-col items-center'>
+                  <p>Discounted price</p>
+
+                  {formData.type === 'rent' && (
+                    <span className='text-xs'>($ / month)</span>
+                  )}
                 </div>
               </div>
             )}
