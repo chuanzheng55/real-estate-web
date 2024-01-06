@@ -26,7 +26,7 @@ const ListingItem = ({ listing }) => {
               {listing.description}
             </p>
             <p className=" text-slate-700 mt-2 font-semibold flex items-center">
-              ${" "}
+              $
               {listing.offer
                 ? (
                     Number(listing.regularPrice) - Number(listing.discountPrice)
