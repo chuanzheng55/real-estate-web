@@ -1,12 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useRef } from "react";
-import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytesResumable,
-} from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytesResumable } from "firebase/storage";
 import { app } from "../firebase.js";
 import {
   updateUserStart,
@@ -19,8 +13,10 @@ import {
   signOutUserSuccess,
   signOutUserFailure,
 } from "../redux/user/userSlice";
-
 import { Link } from "react-router-dom";
+
+// Import the ListingsModal component
+import ListingsModal from "../components/ListingsModal.jsx"; // Update the path accordingly
 
 const Profile = () => {
   const { currentUser, loading, error } = useSelector((state) => state.user);
@@ -30,8 +26,11 @@ const Profile = () => {
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
   const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false); // State to control success message popup
   const [showListingsError, setShowListingsError] = useState(false);
   const [userListings, setUserListings] = useState([]);
+  const [isListingsModalOpen, setListingsModalOpen] = useState(false);
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -45,7 +44,7 @@ const Profile = () => {
     const fileName = new Date().getTime() + file.name;
     const storageRef = ref(storage, fileName);
     const uploadTask = uploadBytesResumable(storageRef, file);
-
+    setFileUploadError(false);
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -57,13 +56,16 @@ const Profile = () => {
       (error) => {
         setFileUploadError(true);
       },
+      
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setFormData({ ...formData, avatar: downloadURL });
+          setFileUploadError(false);
         });
       }
     );
   };
+  
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value });
@@ -87,7 +89,12 @@ const Profile = () => {
         return;
       }
       dispatch(updateUserSuccess(data));
-      setUpdateSuccess(true);
+      setUpdateSuccess(true); 
+      setShowSuccessPopup(true); 
+      setTimeout(() => {
+        setUpdateSuccess(false);
+        setShowSuccessPopup(false); // Hide success message popup after 2 seconds
+      }, 2000);
     } catch (error) {
       dispatch(updateUserFailure(error.message));
     }
@@ -133,11 +140,12 @@ const Profile = () => {
       const res = await fetch(`/api/user/listings/${currentUser._id}`);
       const data = await res.json();
       if (data.success === false) {
-        showListingsError(true);
+        setShowListingsError(true);
         return;
       }
 
       setUserListings(data);
+      setListingsModalOpen(true);
     } catch (error) {
       setShowListingsError(true);
     }
@@ -173,13 +181,15 @@ const Profile = () => {
           hidden
           accept="image/.* "
         />
-        <img
-          onClick={() => fileRef.current.click()}
-          src={formData.avatar || currentUser.avatar}
-          alt="profile"
-          className="rounded-full h-24 w-24 object-cover cursor-pointer self-center mt-3 "
-        />
-        <p className="text-sm self-center">
+        <div className="flex justify-center">
+          <img
+            onClick={() => fileRef.current.click()}
+            src={formData.avatar || currentUser.avatar}
+            alt="profile"
+            className="rounded-full h-24 w-24 object-cover cursor-pointer"
+          />
+        </div>
+        <p className="text-center">
           {fileUploadError ? (
             <span className="text-red-700">Failed to upload</span>
           ) : filePercentage > 0 && filePercentage < 100 ? (
@@ -241,60 +251,28 @@ const Profile = () => {
       </div>
 
       <p className="text-red-700 mt-5">{error ? error : " "}</p>
-      <p className="text-green-700 mt-5">
-        {updateSuccess ? "User is updated successfully!" : " "}
-      </p>
+      {/* Render success message popup */}
+      {showSuccessPopup && (
+        <div className="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-700 text-white p-5 rounded-lg m-4 shadow-lg">
+          User is updated successfully!
+        </div>
+      )}
       <button
         onClick={handleShowListings}
-        className=" text-green-700 w-full p-3 border rounded-lg hover:opacity-65"
+        className="text-green-700 w-full p-3 border rounded-lg hover:opacity-65"
       >
-        Show Listings
+        Show My Listings
       </button>
       <p className="text-red-700 mt-5">
         {showListingsError ? "Error showing the listings" : " "}
       </p>
-
-      {userListings && userListings.length > 0 && (
-        <div className="flex flex-col gap-4">
-          <h1 className="text-center mt-7 text-3xl font-semibold">
-            Your Listings
-          </h1>
-          {userListings.map((listing) => (
-            <div
-              key={listing._id}
-              className="border border-slate-400 rounded-lg p-3 flex justify-between items-center gap-5"
-            >
-              <Link to={`/listing/${listing._id}`}>
-                <img
-                  src={listing.imageUrls[0]}
-                  alt="listing cover "
-                  className="h-16 w-16 object-contain"
-                ></img>
-              </Link>
-              <Link
-                className="text-slate-700 font-semibold flex-1 hover:underline truncate"
-                to={`/listing/${listing._id}`}
-              >
-                <p>{listing.name}</p>
-              </Link>
-              <div className="flex flex-col p-3 items-center">
-                <Link to={`/update-listing/${listing._id}`}>
-                  <button type="button" className="text-green-700 uppercase">
-                    Edit
-                  </button>
-                </Link>
-                <button
-                  onClick={() => handleDeleteListing(listing._id)}
-                  type="button"
-                  className="text-red-700 uppercase"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      {/* Render ListingsModal component */}
+      <ListingsModal
+        isOpen={isListingsModalOpen}
+        onRequestClose={() => setListingsModalOpen(false)}
+        listings={userListings}
+        handleDeleteListing={handleDeleteListing}
+      />
     </div>
   );
 };
