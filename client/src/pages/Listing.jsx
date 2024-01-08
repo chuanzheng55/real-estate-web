@@ -47,7 +47,7 @@ const Listing = () => {
     fetchListing();
   }, [params.listingId]);
   return (
-    <main>
+    <main className="">
       {loading && (
         <p className="text-center my-7 font-semibold text-3xl">Loading...</p>
       )}
@@ -62,7 +62,7 @@ const Listing = () => {
             {listing.imageUrls.map((url, index) => (
               <SwiperSlide key={index}>
                 <img
-                  className="object-fill h-[385px] w-full"
+                  className="object-fill h-[400px] w-[800px] mx-auto rounded-md mt-12"
                   src={url}
                   alt={`Slide ${index}`}
                 />

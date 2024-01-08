@@ -68,7 +68,7 @@ const Home = () => {
   return (
     <div>
      <motion.div
-      className="bg-gradient-to-b from-blue-500 to-blue-300 p-8 text-white"
+      className="bg-gradient-to-b from-slate-600 to-blue-100 text-white p-8"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -101,21 +101,20 @@ const Home = () => {
         </Link>
       </div>
     </motion.div>
-      <Swiper navigation>
-        {offerListings &&
-          offerListings.length > 0 &&
-          offerListings.map((listing) => (
-            <SwiperSlide key={listing._id}>
-              <div
-                style={{
-                  background: `url(${listing.imageUrls[0]}) center no-repeat`,
-                  backgroundSize: "cover",
-                  height: "500px",
-                }}
-              ></div>
-            </SwiperSlide>
-          ))}
-      </Swiper>
+    
+    <Swiper navigation>
+  {offerListings &&
+    offerListings.length > 0 &&
+    offerListings.map((listing) => (
+      <SwiperSlide key={listing._id}>
+        <img
+          src={listing.imageUrls[0]} // Assuming that imageUrls[0] contains the image URL
+          alt={`Slide ${listing._id}`}
+          className="object-fill h-[548px] w-[1800px] mx-auto  "
+        />
+      </SwiperSlide>
+    ))}
+</Swiper>
 
       <div className="max-w-6xl mx-auto p-8">
         {offerListings && offerListings.length > 0 && (
