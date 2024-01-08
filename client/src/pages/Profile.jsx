@@ -179,7 +179,7 @@ const Profile = () => {
           type="file"
           ref={fileRef}
           hidden
-          accept="image/.* "
+          accept="image/.*"
         />
         <div className="flex justify-center">
           <img
